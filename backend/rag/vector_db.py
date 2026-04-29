@@ -2,7 +2,7 @@ import os
 from pinecone import Pinecone, ServerlessSpec
 
 def get_index():
-    pc = Pinecone(api_key=os.getenv("pcsk_7GsmAv_2AZadyCqkPmUqDNcNuz3V2M9JvmrBd6ede3Ri3W5xL87Rvqic8hveBSSfL1wHtH"))
+    pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
 
     index_name = "rag"
 
