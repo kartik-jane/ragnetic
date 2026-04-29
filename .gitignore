@@ -1,0 +1,105 @@
+# =========================
+
+# 🔐 ENV FILES (IMPORTANT)
+
+# =========================
+
+.env
+.env.*
+!.env.example
+
+# =========================
+
+# 🐍 PYTHON (BACKEND)
+
+# =========================
+
+**pycache**/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+
+venv/
+env/
+ENV/
+
+# Python build files
+
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Logs
+
+*.log
+
+# =========================
+
+# 🗄️ DATABASE FILES
+
+# =========================
+
+*.db
+*.sqlite3
+
+# =========================
+
+# 📦 NODE (FRONTEND)
+
+# =========================
+
+node_modules/
+frontend/node_modules/
+
+# Build output
+
+dist/
+frontend/dist/
+
+# Vite cache
+
+.vite/
+
+# =========================
+
+# 🧪 TEST / CACHE
+
+# =========================
+
+.cache/
+pytest_cache/
+coverage/
+
+# =========================
+
+# 🖥️ OS / EDITOR FILES
+
+# =========================
+
+.DS_Store
+Thumbs.db
+
+# VS Code
+
+.vscode/
+
+# =========================
+
+# 📂 UPLOADS (OPTIONAL)
+
+# =========================
+
+uploads/*
+!uploads/.gitkeep
+
+# =========================
+
+# 🔒 MISC
+
+# =========================
+
+*.swp
+*.swo
+*~
