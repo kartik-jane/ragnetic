@@ -2,7 +2,6 @@ Flask>=2.2
 Flask-Cors>=3.0
 python-dotenv>=1.0
 google.genai
-google-generativeai
 bcrypt>=4.0.1
 mysql-connector-python>=8.1
 sentence-transformers>=2.2.2
