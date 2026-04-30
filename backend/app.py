@@ -18,7 +18,7 @@ app.secret_key = os.getenv(
 
 CORS(
     app,
-    origins=["http://localhost:5173"],
+    origins=["https://ragnetic-1.onrender.com"],
     supports_credentials=True
 )
 
@@ -29,4 +29,5 @@ app.register_blueprint(login_bp)
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.getenv("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=False)
