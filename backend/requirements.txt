@@ -11,3 +11,7 @@ pypdf>=3.8.0
 python-docx>=0.8.11
 gunicorn>=20.1
 requests>=2.31
+
+flask-cors   
+google-generativeai
+sentence-transformers
