@@ -18,7 +18,13 @@ app.secret_key = os.getenv(
 
 CORS(
     app,
-    origins=["https://ragnetic-1.onrender.com"],
+    origins=[
+        "https://ragnetic-1.onrender.com",
+        "http://localhost:5173",
+        "http://localhost:3000",
+        "http://127.0.0.1:5173",
+        "http://127.0.0.1:3000"
+    ],
     supports_credentials=True
 )
 
