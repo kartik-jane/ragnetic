@@ -10,10 +10,7 @@ import tempfile
 import os
 
 
-# Create blueprint
 rag_bp = Blueprint("rag", __name__)
-
-# Initialize SQLite handler
 db = SQLiteHandler()
 
 
@@ -26,9 +23,8 @@ def ask():
     if not user_id and not management_id and not admin_id:
         return jsonify({"error": "Authentication required"}), 401
 
-    # Determine index type
     if admin_id:
-        index_type = "both"  # Admin has access to both indexes
+        index_type = "both"
         db_user_id = admin_id
     elif management_id:
         index_type = "management"
@@ -47,21 +43,14 @@ def ask():
         if not query:
             return jsonify({"error": "No query provided"}), 400
 
-        # Create new conversation if not exists
         if not conversation_id:
             if admin_id:
-                conversation_id = db.create_conversation(
-                    query, admin_id=admin_id
-                )
+                conversation_id = db.create_conversation(query, admin_id=admin_id)
             else:
-                conversation_id = db.create_conversation(
-                    query, user_id=db_user_id
-                )
+                conversation_id = db.create_conversation(query, user_id=db_user_id)
 
-        # Save user message
         db.add_message(conversation_id, "user", query, attached_files)
 
-        # Build conversation history context
         history_context = ""
         if conversation_history and len(conversation_history) > 0:
             history_context = "\n\nConversation History:\n"
@@ -69,63 +58,25 @@ def ask():
                 role = "User" if msg["role"] == "user" else "Assistant"
                 history_context += f"{role}: {msg['content']}\n"
 
-        # If file context is provided
+        comprehensive_keywords = [
+            "all", "list", "complete", "every", "total", "entire",
+            "every single", "all the", "complete list", "full list",
+            "everything", "all information", "comprehensive",
+        ]
+
         if file_context:
             query_lower = query.lower()
-            is_comprehensive = any(
-                word in query_lower
-                for word in [
-                    "all",
-                    "list",
-                    "complete",
-                    "every",
-                    "total",
-                    "entire",
-                    "every single",
-                    "all the",
-                    "complete list",
-                    "full list",
-                    "everything",
-                    "all information",
-                    "comprehensive",
-                ]
-            )
+            is_comprehensive = any(w in query_lower for w in comprehensive_keywords)
 
             if is_comprehensive:
-                db_results = retrieve_comprehensive(
-                    query, index_type=index_type
-                )
+                db_results = retrieve_comprehensive(query, index_type=index_type)
             else:
                 db_results = retrieve(query, index_type=index_type)
 
             if db_results and len(db_results) > 0:
-                query_lower = query.lower()
-                is_comprehensive = any(
-                    word in query_lower
-                    for word in [
-                        "all",
-                        "list",
-                        "complete",
-                        "every",
-                        "total",
-                        "entire",
-                        "every single",
-                        "all the",
-                        "complete list",
-                        "full list",
-                        "everything",
-                        "all information",
-                        "comprehensive",
-                    ]
-                )
-
+                is_comprehensive = any(w in query.lower() for w in comprehensive_keywords)
                 max_contexts = 15 if is_comprehensive else 8
-                db_context = "\n\n".join(
-                    [
-                        r["metadata"]["text"]
-                        for r in db_results[:max_contexts]
-                    ]
-                )
+                db_context = "\n\n".join([r["metadata"]["text"] for r in db_results[:max_contexts]])
 
                 enhanced_query = f"""
 Uploaded File Content:
@@ -153,49 +104,22 @@ Instructions:
 
         else:
             query_lower = query.lower()
-            is_comprehensive = any(
-                word in query_lower
-                for word in [
-                    "all",
-                    "list",
-                    "complete",
-                    "every",
-                    "total",
-                    "entire",
-                    "every single",
-                    "all the",
-                    "complete list",
-                    "full list",
-                    "everything",
-                    "all information",
-                    "comprehensive",
-                ]
-            )
+            is_comprehensive = any(w in query_lower for w in comprehensive_keywords)
 
             if is_comprehensive:
-                results = retrieve_comprehensive(
-                    query, index_type=index_type
-                )
+                results = retrieve_comprehensive(query, index_type=index_type)
             else:
                 results = retrieve(query, index_type=index_type)
 
             if history_context:
-                contextualized_query = (
-                    f"{history_context}\n\nCurrent User Question: {query}"
-                )
+                contextualized_query = f"{history_context}\n\nCurrent User Question: {query}"
                 answer = generate_answer(contextualized_query, results)
             else:
                 answer = generate_answer(query, results)
 
-        # Save assistant message
         db.add_message(conversation_id, "assistant", answer)
 
-        return jsonify(
-            {
-                "answer": answer,
-                "conversation_id": conversation_id,
-            }
-        )
+        return jsonify({"answer": answer, "conversation_id": conversation_id})
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -274,9 +198,7 @@ def rename_conversation(conversation_id):
         if not new_title:
             return jsonify({"error": "Title is required"}), 400
 
-        success = db.update_conversation_title(
-            conversation_id, new_title
-        )
+        success = db.update_conversation_title(conversation_id, new_title)
 
         if success:
             return jsonify({"message": "Conversation renamed"})
@@ -314,39 +236,33 @@ def admin_upload():
             text = parse_file(tmp.name)
             emb = create_embedding(text)
 
-            safe_filename = "".join(
-                c if ord(c) < 128 else "_" for c in file.filename
-            )
+            safe_filename = "".join(c if ord(c) < 128 else "_" for c in file.filename)
             vector_id = safe_filename.replace(" ", "_")
 
             if index_type == "both":
-                user_index = get_index("user")
-                management_index = get_index("management")
+                user_index = get_index("rag-user")
+                management_index = get_index("rag-management")
 
-                user_index.upsert(
-                    [(vector_id, emb, {"text": text, "source": file.filename})]
-                )
-                management_index.upsert(
-                    [(vector_id, emb, {"text": text, "source": file.filename})]
-                )
+                user_index.upsert([(vector_id, emb, {"text": text, "source": file.filename})])
+                management_index.upsert([(vector_id, emb, {"text": text, "source": file.filename})])
 
-                return jsonify(
-                    {
-                        "message": f"File '{file.filename}' uploaded and indexed successfully to both user and management indexes"
-                    }
-                )
+                return jsonify({
+                    "message": f"File '{file.filename}' uploaded and indexed successfully to both user and management indexes"
+                })
+
+            elif index_type == "management":
+                index = get_index("rag-management")
+                index.upsert([(vector_id, emb, {"text": text, "source": file.filename})])
+                return jsonify({
+                    "message": f"File '{file.filename}' uploaded and indexed successfully to management index"
+                })
 
             else:
-                index = get_index()
-                index.upsert(
-                    [(vector_id, emb, {"text": text, "source": file.filename})]
-                )
-
-                return jsonify(
-                    {
-                        "message": f"File '{file.filename}' uploaded and indexed successfully to {index_type} index"
-                    }
-                )
+                index = get_index("rag-user")
+                index.upsert([(vector_id, emb, {"text": text, "source": file.filename})])
+                return jsonify({
+                    "message": f"File '{file.filename}' uploaded and indexed successfully to user index"
+                })
 
         finally:
             try:

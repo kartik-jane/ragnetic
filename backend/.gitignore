@@ -1,7 +1,13 @@
 .env
-venv/
-venv/
-backend/venv/
 __pycache__/
 *.pyc
-.env
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+*.db
+.DS_Store
+venv/
+.venv/
