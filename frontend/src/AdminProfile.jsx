@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import API_URL from './apiConfig'
 
 export default function AdminProfile({ onClose }) {
   const [profile, setProfile] = useState(null)
@@ -10,7 +11,7 @@ export default function AdminProfile({ onClose }) {
 
   const fetchProfile = async () => {
     try {
-      const res = await fetch('http://localhost:5000/admin/check-auth', { credentials: 'include' })
+      const res = await fetch(`${API_URL}/admin/check-auth`, { credentials: 'include' })
       if (!res.ok) throw new Error('Failed to load admin profile')
       const data = await res.json()
       setProfile(data.admin)
@@ -23,7 +24,7 @@ export default function AdminProfile({ onClose }) {
   const save = async () => {
     setSaving(true)
     try {
-      const res = await fetch('http://localhost:5000/profile', {
+      const res = await fetch(`${API_URL}/profile`, {
         method: 'PUT', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form)
       })
       const data = await res.json()
