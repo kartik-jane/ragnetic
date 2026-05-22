@@ -1,7 +1,7 @@
 import sqlite3
 import os
 from datetime import datetime
-import google.generativeai as genai
+import google.genai as genai
 import bcrypt
 import json
 from threading import Lock
@@ -149,11 +149,10 @@ class SQLiteHandler:
             if not api_key:
                 return first_message[:50] + "..." if len(first_message) > 50 else first_message
             
-            genai.configure(api_key=api_key)
-            model = genai.GenerativeModel('gemini-2.5-flash')
+            client = genai.Client(api_key=api_key)
             
             prompt = f"Generate a short 3-5 word title for a conversation that starts with: '{first_message[:100]}'. Only return the title, nothing else."
-            response = model.generate_content(prompt)
+            response = client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
             title = response.text.strip().replace('"', '').replace("'", "")
             
             return title[:100]  # Limit to 100 chars
