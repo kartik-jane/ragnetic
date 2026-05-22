@@ -1,59 +1,36 @@
-from urllib import response
-
 import google.genai as genai
 import os
 
 
 def generate_answer(query, contexts):
     try:
-        # Initialize Gemini API
         api_key = os.getenv("GEMINI_API_KEY")
         if not api_key:
             return "API key not configured. Please check your environment settings."
 
         client = genai.Client(api_key=api_key)
 
-        # Check if we have relevant context from vector DB
         has_context = contexts and len(contexts) > 0
 
         if has_context:
-            # Dynamically adjust number of contexts based on query type
             query_lower = query.lower()
             is_comprehensive = any(
                 word in query_lower
                 for word in [
-                    "all",
-                    "list",
-                    "complete",
-                    "every",
-                    "total",
-                    "entire",
-                    "every single",
-                    "all the",
-                    "complete list",
-                    "full list",
-                    "everything",
-                    "all information",
-                    "comprehensive",
+                    "all", "list", "complete", "every", "total", "entire",
+                    "every single", "all the", "complete list", "full list",
+                    "everything", "all information", "comprehensive",
                 ]
             )
 
-            # Use more contexts for comprehensive queries
             max_contexts = 15 if is_comprehensive else 8
             top_contexts = contexts[:max_contexts]
 
-            # Build context from vector DB results
-            context_parts = []
-            for c in top_contexts:
-                text = c["metadata"]["text"]
-                context_parts.append(text)
-
+            context_parts = [c["metadata"]["text"] for c in top_contexts]
             context = "\n\n".join(context_parts)
 
             print(f"[DEBUG] Query: {query}")
-            print(
-                f"[DEBUG] Context length: {len(context)} chars from {len(top_contexts)} sources"
-            )
+            print(f"[DEBUG] Context length: {len(context)} chars from {len(top_contexts)} sources")
 
             prompt = f"""
 You are a conversational AI assistant integrated with a Retrieval-Augmented Generation (RAG) system.
@@ -92,12 +69,10 @@ CRITICAL RESPONSE INSTRUCTIONS (VERY IMPORTANT)
 4. NAME & TERM SAFETY:
 • Preserve ALL proper names, company names, technical terms, and spellings EXACTLY
 • Do NOT rename, shorten, or rephrase names
-• If the user misspells a known name, politely correct it using the exact stored spelling
 
 5. ANSWER QUALITY:
 • Be clear, friendly, and professional
 • Use paragraphs or bullet points ONLY when it improves readability
-• Avoid robotic or repetitive phrasing
 
 6. WHEN INFORMATION IS PARTIAL:
 • Clearly explain what is known
@@ -152,10 +127,6 @@ Answer the question in a friendly and helpful way.
         return "I couldn't process that request. Please try rephrasing your question."
 
 
-# ==========================================================
-# 🔥 STREAMING FEATURE (ADDED — ORIGINAL CODE UNCHANGED)
-# ==========================================================
-
 def stream_generate_answer(query, contexts):
     try:
         api_key = os.getenv("GEMINI_API_KEY")
@@ -172,30 +143,16 @@ def stream_generate_answer(query, contexts):
             is_comprehensive = any(
                 word in query_lower
                 for word in [
-                    "all",
-                    "list",
-                    "complete",
-                    "every",
-                    "total",
-                    "entire",
-                    "every single",
-                    "all the",
-                    "complete list",
-                    "full list",
-                    "everything",
-                    "all information",
-                    "comprehensive",
+                    "all", "list", "complete", "every", "total", "entire",
+                    "every single", "all the", "complete list", "full list",
+                    "everything", "all information", "comprehensive",
                 ]
             )
 
             max_contexts = 15 if is_comprehensive else 8
             top_contexts = contexts[:max_contexts]
 
-            context_parts = []
-            for c in top_contexts:
-                text = c["metadata"]["text"]
-                context_parts.append(text)
-
+            context_parts = [c["metadata"]["text"] for c in top_contexts]
             context = "\n\n".join(context_parts)
 
             prompt = f"""

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import API_URL from './apiConfig'
 
 export default function Register({ onBackToLogin }) {
   const [formData, setFormData] = useState({
@@ -43,7 +44,7 @@ export default function Register({ onBackToLogin }) {
     setLoading(true)
 
     try {
-      const res = await fetch('http://localhost:5000/register', {
+      const res = await fetch(`${API_URL}/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

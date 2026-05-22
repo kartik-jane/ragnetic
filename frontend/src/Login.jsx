@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import API_URL from './apiConfig'
 
 export default function Login({ onLoginSuccess, onRegisterClick, onAdminClick, onManagementClick }) {
   const [formData, setFormData] = useState({
@@ -14,7 +15,7 @@ export default function Login({ onLoginSuccess, onRegisterClick, onAdminClick, o
     setLoading(true)
 
     try {
-      const res = await fetch('http://localhost:5000/login', {
+      const res = await fetch(`${API_URL}/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

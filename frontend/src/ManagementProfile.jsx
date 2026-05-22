@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import API_URL from './apiConfig'
 
 export default function ManagementProfile({ onBack }) {
   const [profile, setProfile] = useState(null)
@@ -10,7 +11,7 @@ export default function ManagementProfile({ onBack }) {
 
   const fetchProfile = async () => {
     try {
-      const res = await fetch('http://localhost:5000/profile', { credentials: 'include' })
+      const res = await fetch(`${API_URL}/profile`, { credentials: 'include' })
       if (!res.ok) throw new Error('Failed to load profile')
       const data = await res.json()
       setProfile(data.user)
