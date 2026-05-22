@@ -1,4 +1,3 @@
-github pe already ye wali hi hai
 Flask>=2.2
 Flask-Cors>=3.0
 python-dotenv>=1.0
