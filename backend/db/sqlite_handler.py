@@ -1,7 +1,7 @@
 import sqlite3
 import os
 from datetime import datetime
-import google.generativeai as genai
+import google.genai as genai
 import bcrypt
 import json
 from threading import Lock
