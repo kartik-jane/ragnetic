@@ -1,5 +1,4 @@
-import { useEffect, useState } from 'react'
-
+import { useEffect, useState } from 'react'import { apiFetch } from './api'
 export default function AdminProfile({ onClose }) {
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -10,7 +9,7 @@ export default function AdminProfile({ onClose }) {
 
   const fetchProfile = async () => {
     try {
-      const res = await fetch('http://localhost:3000/admin/check-auth', { credentials: 'include' })
+      const res = await apiFetch('/admin/check-auth', { credentials: 'include' })
       if (!res.ok) throw new Error('Failed to load admin profile')
       const data = await res.json()
       setProfile(data.admin)
@@ -23,7 +22,7 @@ export default function AdminProfile({ onClose }) {
   const save = async () => {
     setSaving(true)
     try {
-      const res = await fetch('http://localhost:3000/profile', {
+      const res = await apiFetch('/profile', {
         method: 'PUT', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form)
       })
       const data = await res.json()
