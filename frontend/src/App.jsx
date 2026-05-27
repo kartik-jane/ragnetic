@@ -277,35 +277,61 @@ export default function App() {
   const handleFileSelect = async (e) => {
     const files = Array.from(e.target.files)
     if (files.length === 0) return
-    
+
+    // Reset the input so the same file can be re-selected later
+    e.target.value = ''
+
     // Upload each file and store
     const uploadedFiles = []
     let combinedContent = ''
-    
+    const failedFiles = []
+
     for (const file of files) {
       const formData = new FormData()
       formData.append('file', file)
-      
+
       try {
         const res = await fetch('http://localhost:5000/upload-chat-file', {
           method: 'POST',
           credentials: 'include',
           body: formData
         })
-        
+
         if (res.ok) {
           const data = await res.json()
-          uploadedFiles.push({ name: file.name })
-          combinedContent += `\n\n=== File: ${file.name} ===\n${data.content}`
+          if (data.success && data.content) {
+            uploadedFiles.push({ name: file.name })
+            combinedContent += `\n\n=== File: ${file.name} ===\n${data.content}`
+          } else {
+            console.error('File uploaded but no content returned for:', file.name)
+            failedFiles.push(file.name)
+          }
+        } else {
+          // Parse error response from server
+          let errorMsg = `Failed to upload "${file.name}"`
+          try {
+            const errData = await res.json()
+            if (errData.error) errorMsg = `"${file.name}": ${errData.error}`
+          } catch (_) {}
+          console.error('Upload error:', errorMsg)
+          failedFiles.push(file.name)
         }
       } catch (error) {
-        console.error('Error uploading file:', error)
+        console.error('Error uploading file:', file.name, error)
+        failedFiles.push(file.name)
       }
     }
-    
-    // Store all files and combined content
-    setAttachedFiles(uploadedFiles)
-    setCurrentFileContext(combinedContent)
+
+    // Show error alert if any files failed
+    if (failedFiles.length > 0) {
+      alert(`Failed to upload the following file(s):\n${failedFiles.join('\n')}\n\nSupported formats: PDF, DOCX, TXT`)
+    }
+
+    // Only update state if at least one file succeeded
+    if (uploadedFiles.length > 0) {
+      setAttachedFiles(uploadedFiles)
+      setCurrentFileContext(combinedContent)
+    }
   }
 
   const removeFile = (index) => {
