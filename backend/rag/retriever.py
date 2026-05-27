@@ -6,8 +6,8 @@ def retrieve(query, top_k=20, index_type="user"):
 
     # If index_type is "both", query both indexes and combine results
     if index_type == "both":
-        user_index = get_index()
-        management_index = get_index()
+        user_index = get_index("user")
+        management_index = get_index("management")
         
         user_result = user_index.query(vector=emb, top_k=top_k, include_metadata=True)
         management_result = management_index.query(vector=emb, top_k=top_k, include_metadata=True)
@@ -16,7 +16,7 @@ def retrieve(query, top_k=20, index_type="user"):
         all_matches.sort(key=lambda x: x["score"], reverse=True)
         return all_matches[:top_k]
 
-    index = get_index()
+    index = get_index(index_type)
     result = index.query(
         vector=emb,
         top_k=top_k,
@@ -33,8 +33,8 @@ def retrieve_comprehensive(query, index_type="user", max_results=50):
     if index_type == "both":
         for q in query_variations:
             emb = create_embedding(q)
-            user_index = get_index()
-            management_index = get_index()
+            user_index = get_index("user")
+            management_index = get_index("management")
 
             user_result = user_index.query(vector=emb, top_k=15, include_metadata=True)
             management_result = management_index.query(vector=emb, top_k=15, include_metadata=True)
@@ -52,7 +52,7 @@ def retrieve_comprehensive(query, index_type="user", max_results=50):
     else:
         for q in query_variations:
             emb = create_embedding(q)
-            index = get_index()
+            index = get_index(index_type)
 
             result = index.query(
                 vector=emb,

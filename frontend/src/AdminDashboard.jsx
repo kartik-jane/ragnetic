@@ -65,8 +65,8 @@ export default function AdminDashboard({ admin, onLogout }) {
     try {
       // Load both users and API keys in parallel for better performance
       const [usersResponse, keysResponse] = await Promise.all([
-        fetch('http://localhost:5000/admin/all-users', { credentials: 'include' }),
-        fetch('http://localhost:5000/admin/api-keys', { credentials: 'include' })
+        fetch('http://localhost:3000/admin/all-users', { credentials: 'include' }),
+        fetch('http://localhost:3000/admin/api-keys', { credentials: 'include' })
       ])
       
       if (!usersResponse.ok || !keysResponse.ok) {
@@ -98,7 +98,7 @@ export default function AdminDashboard({ admin, onLogout }) {
   const loadApiKeys = async () => {
     setLoadingKeys(true)
     try {
-      const res = await fetch('http://localhost:5000/admin/api-keys', {
+      const res = await fetch('http://localhost:3000/admin/api-keys', {
         credentials: 'include'
       })
       const data = await res.json()
@@ -126,7 +126,7 @@ export default function AdminDashboard({ admin, onLogout }) {
 
     setGeneratingKey(true)
     try {
-      const res = await fetch('http://localhost:5000/admin/api-keys/generate', {
+      const res = await fetch('http://localhost:3000/admin/api-keys/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -163,7 +163,7 @@ export default function AdminDashboard({ admin, onLogout }) {
     }
 
     try {
-      const res = await fetch(`http://localhost:5000/admin/api-keys/${keyId}`, {
+      const res = await fetch(`http://localhost:3000/admin/api-keys/${keyId}`, {
         method: 'DELETE',
         credentials: 'include'
       })
@@ -189,7 +189,7 @@ export default function AdminDashboard({ admin, onLogout }) {
     }
 
     try {
-      const res = await fetch(`http://localhost:5000/admin/users/${userId}`, {
+      const res = await fetch(`http://localhost:3000/admin/users/${userId}`, {
         method: 'DELETE',
         credentials: 'include'
       })
@@ -213,7 +213,7 @@ export default function AdminDashboard({ admin, onLogout }) {
   const loadAllUsers = async () => {
     setLoadingUsers(true)
     try {
-      const res = await fetch('http://localhost:5000/admin/all-users', {
+      const res = await fetch('http://localhost:3000/admin/all-users', {
         credentials: 'include'
       })
       const data = await res.json()
@@ -231,7 +231,7 @@ export default function AdminDashboard({ admin, onLogout }) {
 
   const toggleUserStatus = async (userId) => {
     try {
-      const res = await fetch(`http://localhost:5000/admin/toggle-user/${userId}`, {
+      const res = await fetch(`http://localhost:3000/admin/toggle-user/${userId}`, {
         method: 'POST',
         credentials: 'include'
       })
@@ -252,7 +252,7 @@ export default function AdminDashboard({ admin, onLogout }) {
 
   const changePassword = async (currentPassword, newPassword) => {
     try {
-      const res = await fetch('http://localhost:5000/admin/change-password', {
+      const res = await fetch('http://localhost:3000/admin/change-password', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -297,19 +297,25 @@ export default function AdminDashboard({ admin, onLogout }) {
       formData.append('index_type', indexType)
 
       try {
-        const res = await fetch('http://localhost:5000/admin/upload', {
+        const res = await fetch('http://localhost:3000/admin/upload', {
           method: 'POST',
           credentials: 'include',
           body: formData
         })
 
+        const data = await res.json()
+        console.log(`Upload response for ${file.name}:`, res.status, data)
+
         if (res.ok) {
           successCount++
+          console.log(`✓ ${file.name} uploaded successfully`)
         } else {
           failCount++
+          console.error(`✗ ${file.name} failed:`, data.error)
         }
       } catch (error) {
         failCount++
+        console.error(`Upload error for ${file.name}:`, error)
       }
     }
 
@@ -322,7 +328,7 @@ export default function AdminDashboard({ admin, onLogout }) {
   // AI Chat Functions
   const loadConversations = async () => {
     try {
-      const res = await fetch('http://localhost:5000/conversations', { credentials: 'include' })
+      const res = await fetch('http://localhost:3000/conversations', { credentials: 'include' })
       const data = await res.json()
       setConversations(data.conversations || [])
     } catch (error) {
@@ -340,7 +346,7 @@ export default function AdminDashboard({ admin, onLogout }) {
   const loadConversation = async (convId) => {
     try {
       setCurrentConversationId(convId)
-      const res = await fetch(`http://localhost:5000/conversations/${convId}`, { credentials: 'include' })
+      const res = await fetch(`http://localhost:3000/conversations/${convId}`, { credentials: 'include' })
       const data = await res.json()
       setMessages(data.messages || [])
       setAttachedFiles([])
@@ -387,7 +393,7 @@ export default function AdminDashboard({ admin, onLogout }) {
     setInput('')
 
     try {
-      const res = await fetch('http://localhost:5000/ask', {
+      const res = await fetch('http://localhost:3000/ask', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -422,7 +428,7 @@ export default function AdminDashboard({ admin, onLogout }) {
 
   const handleDeleteConversation = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/conversations/${deleteConfirmation.convId}`, {
+      const res = await fetch(`http://localhost:3000/conversations/${deleteConfirmation.convId}`, {
         method: 'DELETE',
         credentials: 'include'
       })
@@ -443,7 +449,7 @@ export default function AdminDashboard({ admin, onLogout }) {
     if (!editingTitle.trim()) return
 
     try {
-      const res = await fetch(`http://localhost:5000/conversations/${convId}/rename`, {
+      const res = await fetch(`http://localhost:3000/conversations/${convId}/rename`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

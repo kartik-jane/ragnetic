@@ -10,7 +10,7 @@ export default function UserProfile({ onBack }) {
 
   const fetchProfile = async () => {
     try {
-      const res = await fetch('http://localhost:5000/profile', { credentials: 'include' })
+      const res = await fetch('http://localhost:3000/profile', { credentials: 'include' })
       if (!res.ok) throw new Error('Failed to load profile')
       const data = await res.json()
       setProfile(data.user)

@@ -56,7 +56,7 @@ export default function App() {
   const checkAuth = async () => {
     try {
       // Check if user is authenticated
-      const userRes = await fetch('http://localhost:5000/check-auth', {
+      const userRes = await fetch('http://localhost:3000/check-auth', {
         credentials: 'include'
       })
       if (userRes.ok) {
@@ -69,7 +69,7 @@ export default function App() {
       }
       
       // Check if admin is authenticated
-      const adminRes = await fetch('http://localhost:5000/admin/check-auth', {
+      const adminRes = await fetch('http://localhost:3000/admin/check-auth', {
         credentials: 'include'
       })
       if (adminRes.ok) {
@@ -81,7 +81,7 @@ export default function App() {
       }
       
       // Check if management is authenticated
-      const managementRes = await fetch('http://localhost:5000/check-auth', {
+      const managementRes = await fetch('http://localhost:3000/check-auth', {
         credentials: 'include'
       })
       if (managementRes.ok) {
@@ -131,7 +131,7 @@ export default function App() {
 
   const handleAdminLogout = async () => {
     try {
-      await fetch('http://localhost:5000/admin/logout', {
+      await fetch('http://localhost:3000/admin/logout', {
         method: 'POST',
         credentials: 'include'
       })
@@ -145,7 +145,7 @@ export default function App() {
 
   const handleManagementLogout = async () => {
     try {
-      await fetch('http://localhost:5000/logout', {
+      await fetch('http://localhost:3000/logout', {
         method: 'POST',
         credentials: 'include'
       })
@@ -161,7 +161,7 @@ export default function App() {
 
   const handleLogout = async () => {
     try {
-      await fetch('http://localhost:5000/logout', {
+      await fetch('http://localhost:3000/logout', {
         method: 'POST',
         credentials: 'include'
       })
@@ -180,7 +180,7 @@ export default function App() {
 
   const loadConversations = async () => {
     try {
-      const res = await fetch('http://localhost:5000/conversations', {
+      const res = await fetch('http://localhost:3000/conversations', {
         credentials: 'include'
       })
       const data = await res.json()
@@ -192,7 +192,7 @@ export default function App() {
 
   const loadConversation = async (convId) => {
     try {
-      const res = await fetch(`http://localhost:5000/conversations/${convId}`, {
+      const res = await fetch(`http://localhost:3000/conversations/${convId}`, {
         credentials: 'include'
       })
       const data = await res.json()
@@ -227,7 +227,7 @@ export default function App() {
   const confirmDelete = async () => {
     const { convId } = deleteConfirmation
     try {
-      await fetch(`http://localhost:5000/conversations/${convId}`, { 
+      await fetch(`http://localhost:3000/conversations/${convId}`, { 
         method: 'DELETE',
         credentials: 'include'
       })
@@ -257,7 +257,7 @@ export default function App() {
     if (!editingTitle.trim()) return
     
     try {
-      const res = await fetch(`http://localhost:5000/conversations/${convId}/rename`, {
+      const res = await fetch(`http://localhost:3000/conversations/${convId}/rename`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -291,7 +291,7 @@ export default function App() {
       formData.append('file', file)
 
       try {
-        const res = await fetch('http://localhost:5000/upload-chat-file', {
+        const res = await fetch('http://localhost:3000/upload-chat-file', {
           method: 'POST',
           credentials: 'include',
           body: formData
@@ -367,7 +367,7 @@ export default function App() {
 
     try {
       // Always use JSON - include file context and conversation history
-      const res = await fetch('http://localhost:5000/ask', {
+      const res = await fetch('http://localhost:3000/ask', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
