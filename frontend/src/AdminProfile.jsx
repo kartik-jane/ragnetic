@@ -10,7 +10,7 @@ export default function AdminProfile({ onClose }) {
 
   const fetchProfile = async () => {
     try {
-      const res = await fetch('http://localhost:5000/admin/check-auth', { credentials: 'include' })
+      const res = await fetch('http://localhost:3000/admin/check-auth', { credentials: 'include' })
       if (!res.ok) throw new Error('Failed to load admin profile')
       const data = await res.json()
       setProfile(data.admin)
@@ -23,7 +23,7 @@ export default function AdminProfile({ onClose }) {
   const save = async () => {
     setSaving(true)
     try {
-      const res = await fetch('http://localhost:5000/profile', {
+      const res = await fetch('http://localhost:3000/profile', {
         method: 'PUT', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form)
       })
       const data = await res.json()

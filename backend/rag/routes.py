@@ -309,10 +309,25 @@ def admin_upload():
         suffix=os.path.splitext(file.filename)[1],
     ) as tmp:
         file.save(tmp.name)
+        file_size = os.path.getsize(tmp.name)
+        print(f"[UPLOAD] File saved: {file.filename}, size: {file_size} bytes")
 
         try:
+            print(f"[UPLOAD] Processing file: {file.filename}, index_type: {index_type}")
+            
             text = parse_file(tmp.name)
+            print(f"[UPLOAD] File parsed, text length: {len(text) if text else 0}")
+            
+            # Guard against empty parsed content
+            if not text or not text.strip():
+                print(f"[UPLOAD] ERROR: Empty text extracted from {file.filename}")
+                return jsonify({
+                    "error": f"No readable text could be extracted from '{file.filename}'. The file may be empty, scanned, or image-based."
+                }), 422
+            
+            print(f"[UPLOAD] Creating embedding...")
             emb = create_embedding(text)
+            print(f"[UPLOAD] Embedding created, dimension: {len(emb)}")
 
             safe_filename = "".join(
                 c if ord(c) < 128 else "_" for c in file.filename
@@ -320,6 +335,7 @@ def admin_upload():
             vector_id = safe_filename.replace(" ", "_")
 
             if index_type == "both":
+                print(f"[UPLOAD] Uploading to both indexes...")
                 user_index = get_index("user")
                 management_index = get_index("management")
 
@@ -330,6 +346,7 @@ def admin_upload():
                     [(vector_id, emb, {"text": text, "source": file.filename})]
                 )
 
+                print(f"[UPLOAD] SUCCESS: File uploaded to both indexes")
                 return jsonify(
                     {
                         "message": f"File '{file.filename}' uploaded and indexed successfully to both user and management indexes"
@@ -337,17 +354,27 @@ def admin_upload():
                 )
 
             else:
-                index = get_index()
+                print(f"[UPLOAD] Uploading to {index_type} index...")
+                index = get_index(index_type)
                 index.upsert(
                     [(vector_id, emb, {"text": text, "source": file.filename})]
                 )
 
+                print(f"[UPLOAD] SUCCESS: File uploaded to {index_type} index")
                 return jsonify(
                     {
                         "message": f"File '{file.filename}' uploaded and indexed successfully to {index_type} index"
                     }
                 )
 
+        except ValueError as ve:
+            print(f"[UPLOAD] ValueError: {str(ve)}")
+            return jsonify({"error": str(ve)}), 400
+        except Exception as e:
+            print(f"[UPLOAD] ERROR: {type(e).__name__}: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            return jsonify({"error": f"Upload failed: {str(e)}"}), 500
         finally:
             try:
                 os.unlink(tmp.name)
