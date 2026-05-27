@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { apiFetch } from './api'
 
 export default function Register({ onBackToLogin }) {
   const [formData, setFormData] = useState({
@@ -43,7 +44,7 @@ export default function Register({ onBackToLogin }) {
     setLoading(true)
 
     try {
-      const res = await fetch('http://localhost:3000/register', {
+      const res = await apiFetch('/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

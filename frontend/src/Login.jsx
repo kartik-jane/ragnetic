@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { apiFetch } from './api'
 
 export default function Login({ onLoginSuccess, onRegisterClick, onAdminClick, onManagementClick }) {
   const [formData, setFormData] = useState({
@@ -14,7 +15,7 @@ export default function Login({ onLoginSuccess, onRegisterClick, onAdminClick, o
     setLoading(true)
 
     try {
-      const res = await fetch('http://localhost:3000/login', {
+      const res = await apiFetch('/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
